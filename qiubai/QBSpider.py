@@ -22,6 +22,9 @@ class QBSpider:
         self.stories = []
         # 存放程序是否继续运行的变量
         self.enable = False
+        # python2.7.9之后引入了一个新特性，当使用urllib.urlopen打开一个https链接时，会验证一次SSL证书，如果是自签名证书就会报错，
+        # 所以这里全局取消验证
+        ssl._create_default_https_context = ssl._create_unverified_context
 
     # 传入某一页的索引获得页面代码
     def getPage(self, pageIndex):
@@ -48,7 +51,7 @@ class QBSpider:
         pattern = re.compile(
             'author clearfix">.*?<h2>(.*?)</h2>.*?<div.*?content">.*?<span>(.*?)</span>.*?gif\s-->(.*?)<!--.*?number">(.*?)</i>',
             re.S)
-        items = re.findall(pageIndex, content)
+        items = re.findall(pattern, content)
         # 用来存储每页的段子们
         pageStories = []
         # 遍历正则表达式匹配的信息
@@ -76,6 +79,39 @@ class QBSpider:
                     self.stories.append(pageStories)
                     self.pageIndex += 1
 
+    # 调用该方法，每次敲回车打印输出一个段子
     def getOneStory(self, pageStories, page):
+        # 遍历一页的段子
         for story in pageStories:
+            # 等待用户输入，注意由于python3将raw_input()改为了input()，所以不能直接用input当做变量名
             input1 = input()
+            self.loadPage()
+            # 如果输入Q则程序结束
+            if input1 == 'q':
+                self.enable = False
+                return
+            print('第%d页\t发布人:%s\t赞:%s\n%s' % (page, story[0], story[2], story[1]))
+
+    # 开始方法
+    def start(self):
+        print('正在读取糗事百科,按回车查看新段子，Q退出')
+        # 使变量为True，程序可以正常运行
+        self.enable = True
+        # 先加载一页内容
+        self.loadPage()
+        # 局部变量，控制当前读到了第几页
+        nowPage = 0
+        while self.enable:
+            if len(self.stories) > 0:
+                # 从全局list中获取一页的段子
+                pageStories = self.stories[0]
+                # 当前读到的页数加一
+                nowPage += 1
+                # 将全局list中第一个元素删除，因为已经取出
+                del self.stories[0]
+                # 输出该页的段子
+                self.getOneStory(pageStories, nowPage)
+
+
+spider = QBSpider()
+spider.start()
