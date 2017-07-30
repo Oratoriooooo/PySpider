@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # 百度贴吧爬虫类
+# 主要优化：每层信息加了作者、发布时间，文件写入完毕关闭了输出流
 import urllib.request
 import urllib.error
 import ssl
