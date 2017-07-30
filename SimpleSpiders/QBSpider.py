@@ -6,8 +6,6 @@ import ssl
 import urllib.request
 import urllib.error
 
-__author__ = 'aa'
-
 
 # 糗百爬虫类
 class QBSpider:
