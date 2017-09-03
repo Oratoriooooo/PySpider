@@ -51,6 +51,7 @@ class FindJobs:
         self.__DATE_TIME_TEMPLATE = '%Y-%m-%d %H:%M:%S'
         self.__DATE_TEMPLATE = '%Y-%m-%d'
         self.__TIME_TEMPLATE = '%H:%M:%S'
+        self.__FILE_TIME_TEMPLATE = '%Y-%m-%d %H-%M-%S'
 
     # 获取页面上的链接和时间
     def __getPage(self, page='1'):
@@ -145,7 +146,7 @@ class FindJobs:
         lists = lists[num:]
         # 开始写入文件
         self.__fileName = str(nTime) + '.txt'
-        with open(os.path.join(self.__pPath, self.__fileName), 'w+') as file:
+        with open(os.path.join(self.__pPath, self.__fileName), 'w+', encoding='utf-8') as file:
             num = 1
             file.write('本次共抓取到%d条数据_(:з」∠)_\n\n' % len(lists))
             print('本次共抓取到%d条数据_(:з」∠)_' % len(lists))
@@ -164,12 +165,12 @@ class FindJobs:
         fileName = os.path.join(self.__pPath, 'lastTime.txt')
         # 记录当前时间
         nTimeAll = datetime.datetime.now()
-        nTimeAll = nTimeAll.strftime(self.__DATE_TIME_TEMPLATE)
+        nTimeAll = nTimeAll.strftime(self.__FILE_TIME_TEMPLATE)
         # w+模式会清空数据，所以如果存在文件的话需要用r+打开
         if os.path.exists(fileName):
-            file = open(fileName, 'r+')
+            file = open(fileName, 'r+', encoding='utf-8')
         else:
-            file = open(fileName, 'w+')
+            file = open(fileName, 'w+', encoding='utf-8')
         print('开始抓取信息...')
         if not fTime:
             fTime = file.readline()
@@ -184,7 +185,7 @@ class FindJobs:
         if self.__fileName:
             print('抓取完成！已保存在%s' % (os.path.join(self.__pPath, self.__fileName)))
 
-print('请输入保存路径(直接回车保存在默认位置)：')
+print('请输入保存路径(不需要加上findJobs，直接回车保存在默认位置)：')
 path = input()
 findJobs = FindJobs(pPath=path)
 findJobs.start()
