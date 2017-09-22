@@ -112,14 +112,14 @@ class FindJobs:
         return out
 
     # 爬取规则：如果没有爬过，就爬近七天的，如果爬过，就从上次爬的那天开始爬
-    def __gatherList(self, nTime, lastTime=None):
+    def __gatherList(self, saveName, lastTime=None):
         page = 1
         # 如果没有爬取记录，就设置成从七天前开始
         if not lastTime:
             grabTime = (datetime.date.today() - datetime.timedelta(days=7)).strftime(self.__DATE_TEMPLATE)
             grabTime = datetime.datetime.strptime(grabTime, self.__DATE_TEMPLATE)
         else:
-            grabTime = datetime.datetime.strptime(lastTime, self.__DATE_TIME_TEMPLATE)
+            grabTime = datetime.datetime.strptime(lastTime, self.__FILE_TIME_TEMPLATE)
             if grabTime.date() != datetime.date.today():
                 grabTime = grabTime - datetime.timedelta(days=1)
         lists = []
@@ -145,7 +145,7 @@ class FindJobs:
             num += 1
         lists = lists[num:]
         # 开始写入文件
-        self.__fileName = str(nTime) + '.txt'
+        self.__fileName = str(saveName) + '.txt'
         with open(os.path.join(self.__pPath, self.__fileName), 'w+', encoding='utf-8') as file:
             num = 1
             file.write('本次共抓取到%d条数据_(:з」∠)_\n\n' % len(lists))
@@ -165,7 +165,8 @@ class FindJobs:
         fileName = os.path.join(self.__pPath, 'lastTime.txt')
         # 记录当前时间
         nTimeAll = datetime.datetime.now()
-        nTimeAll = nTimeAll.strftime(self.__FILE_TIME_TEMPLATE)
+        saveName = nTimeAll.strftime(self.__FILE_TIME_TEMPLATE)
+        nTimeAll = nTimeAll.strftime(self.__DATE_TIME_TEMPLATE)
         # w+模式会清空数据，所以如果存在文件的话需要用r+打开
         if os.path.exists(fileName):
             file = open(fileName, 'r+', encoding='utf-8')
@@ -175,9 +176,9 @@ class FindJobs:
         if not fTime:
             fTime = file.readline()
         if fTime:
-            self.__gatherList(nTimeAll, fTime)
+            self.__gatherList(fileName, fTime)
         else:
-            self.__gatherList(nTimeAll)
+            self.__gatherList(fileName)
         # 将文件游标设置为开始，覆盖之前的时间
         file.seek(0)
         file.write(nTimeAll)
